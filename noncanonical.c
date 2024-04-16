@@ -11,6 +11,95 @@
 #define FALSE 0
 #define TRUE 1
 
+
+////
+#define FLAG 0x5c
+#define ADDRESS_sent_by_Sender 0x03
+#define ADDRESS_answers_from_Receiver 0x03
+#define ADDRESS_sent_by_Receiver 0x01
+#define ADDRESS_answers_from_Sender 0x01
+
+#define CONTROL_SET 0x08            ////Control_Set
+#define CONTROL_UA 0x06             ////Control_Unsigned Acknowlegment
+                                ////BCC1=XOR(A,C)
+////
+
+
+
+
+int UA(int fd){
+    int res;
+    unsigned char buf2[10];
+    buf2[0]=FLAG;                               ////0x5c
+    buf2[1]=ADDRESS_answers_from_Receiver;      ////0x03
+    buf2[2]=CONTROL_UA;                         ////0x06
+    buf2[3]=buf2[1]^buf2[2];
+    buf2[4]=FLAG;                               ////0x5c
+    buf2[5] = '\n';
+//    printf("Ola: %s; %c\n",buf2,buf[1]);
+    res = write(fd,buf2,5);
+
+    printf("%d bytes written\n", res);
+
+    return NULL;
+}
+
+
+int RR1(int fd){
+    int res;
+    unsigned char buf2[10];
+    buf2[0]=FLAG;                               ////0x5c
+    buf2[1]=ADDRESS_answers_from_Receiver;      ////0x03????????????????????????????
+    buf2[2]=////???????????????????????????????????????????????????????????????
+    buf2[3]=buf2[1]^buf2[2];
+    buf2[4]=FLAG;                               ////0x5c
+    buf2[5] = '\n';
+//    printf("Ola: %s; %c\n",buf2,buf[1]);
+    res = write(fd,buf2,5);
+
+    printf("%d bytes written\n", res);
+
+    return NULL;
+}
+
+int RR0(int fd){
+    int res;
+    unsigned char buf2[10];
+    buf2[0]=FLAG;                               ////0x5c
+    buf2[1]=ADDRESS_answers_from_Receiver;      ////0x03????????????????????????????
+    buf2[2]=////???????????????????????????????????????????????????????????????
+    buf2[3]=buf2[1]^buf2[2];
+    buf2[4]=FLAG;                               ////0x5c
+    buf2[5] = '\n';
+//    printf("Ola: %s; %c\n",buf2,buf[1]);
+    res = write(fd,buf2,5);
+
+    printf("%d bytes written\n", res);
+
+    return NULL;
+}
+
+int DISC(int fd){
+    int res;
+    unsigned char buf2[10];
+    buf2[0]=FLAG;                       ////0x5c
+    buf2[1]=ADDRESS_answers_from_Receiver;     ////0x03
+    buf2[2]=////??????????????????????????????????????????????
+    buf2[3]=buf2[1]^buf2[2];
+    buf2[4]=FLAG;                       ////0x5c
+    buf2[5] = '\n';
+//    printf("Ola: %s; %c\n",buf2,buf[1]);
+    res = write(fd,buf2,5);
+
+    printf("%d bytes written\n", res);
+
+    return NULL;
+}
+
+
+
+
+
 volatile int STOP=FALSE;
 
 int main(int argc, char** argv)
@@ -68,6 +157,7 @@ int main(int argc, char** argv)
     printf("New termios structure set\n");
     
     while (STOP==FALSE) {       /* loop for input */
+        
         res = read(fd,buf,255);   /* returns after 5 chars have been input */
         //buf[res]=0;               /* so we can printf... */
         printf("buf0: %x \n", buf[0]);
@@ -80,9 +170,11 @@ int main(int argc, char** argv)
         printf("buf0: %c \n", buf[2]);
         printf("buf0: %c \n", buf[3]);
         printf("buf0: %c \n", buf[4]);
-        if((buf[0]==0x5c) && (buf[0]==0x5c) && (buf[0]==0x5c) && (buf[0]==0x5c)){
-              
-            break;
+        printf("%d\n",fd);
+        if((buf[0]==0x5c) && (buf[1]==0x03) && (buf[2]==0x08) && (buf[3]==(0x03^0x08)) && (buf[4]==0x5c)){          ////Verifico se recebi a mensagem de SET para enviar um UA
+              UA(fd);
+              break;
+            
         }
         printf(":%s:%d\n", buf, res);
         if (buf[0]=='z') STOP=TRUE;

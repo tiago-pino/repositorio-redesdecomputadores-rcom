@@ -12,7 +12,142 @@
 #define FALSE 0
 #define TRUE 1
 
+////
+#define FLAG 0x5c
+#define ADDRESS_sent_by_Sender 0x03
+#define ADDRESS_answers_from_Receiver 0x03
+#define ADDRESS_sent_by_Receiver 0x01
+#define ADDRESS_answers_from_Sender 0x01
+
+#define CONTROL_SET 0x08            ////Control_Set
+#define CONTROL_UA 0x06             ////Control_Unsigned Acknowlegment
+                                ////BCC1=XOR(A,C)
+////
 volatile int STOP=FALSE;
+
+
+
+int SET(int fd){
+    int res;
+    unsigned char buf2[10];
+    buf2[0]=FLAG;                       ////0x5c
+    buf2[1]=ADDRESS_sent_by_Sender;     ////0x03
+    buf2[2]=CONTROL_SET;                ////0x08
+    buf2[3]=buf2[1]^buf2[2];
+    buf2[4]=FLAG;                       ////0x5c
+    buf2[5] = '\n';
+//    printf("Ola: %s; %c\n",buf2,buf[1]);
+    res = write(fd,buf2,5);
+
+    printf("%d bytes written\n", res);
+
+    return NULL;
+}
+
+int I_0(fd){
+    int res;
+    int n_carateres=1,i=0;
+    unsigned char buf2[10];
+    while(n_carateres){
+        n_carateres = read(fd,buf2[i],1);
+        i++;
+    }
+        printf("buf20: %x \n", buf2[0]);
+        printf("buf20: %x \n", buf2[1]);
+        printf("buf20: %x \n", buf2[2]);
+        printf("buf20: %x \n", buf2[3]);
+        printf("buf20: %x \n", buf2[4]);
+        printf("buf20: %c \n", buf2[0]);
+        printf("buf20: %c \n", buf2[1]);
+        printf("buf20: %c \n", buf2[2]);
+        printf("buf20: %c \n", buf2[3]);
+        printf("buf20: %c \n", buf2[4]);
+    /*buf2[0]=0x5c;
+    buf2[1]=0x03;
+    buf2[2]=0x08;
+    buf2[3]=buf2[1]^buf2[2];
+    buf2[4]=0x5c;
+    buf2[5] = '\n';*/
+//    printf("Ola: %s; %c\n",buf2,buf[1]);
+    res = write(fd,buf2,5);
+
+    printf("%d bytes written\n", res);
+
+    return NULL;
+    
+
+}
+/*
+int I_1(fd){
+    int res;
+    int n_carateres=1,i=0;
+    unsigned char buf2[10];
+    while(n_carateres){
+        n_carateres = read(fd,buf2[i],1);
+        i++;
+    }
+        printf("buf20: %x \n", buf2[0]);
+        printf("buf20: %x \n", buf2[1]);
+        printf("buf20: %x \n", buf2[2]);
+        printf("buf20: %x \n", buf2[3]);
+        printf("buf20: %x \n", buf2[4]);
+        printf("buf20: %c \n", buf2[0]);
+        printf("buf20: %c \n", buf2[1]);
+        printf("buf20: %c \n", buf2[2]);
+        printf("buf20: %c \n", buf2[3]);
+        printf("buf20: %c \n", buf2[4]);
+    /*buf2[0]=0x5c;
+    buf2[1]=0x03;
+    buf2[2]=0x08;
+    buf2[3]=buf2[1]^buf2[2];
+    buf2[4]=0x5c;
+    buf2[5] = '\n';                         *//*
+//    printf("Ola: %s; %c\n",buf2,buf[1]);
+    res = write(fd,buf2,5);
+
+    printf("%d bytes written\n", res);
+
+    return NULL;
+    
+
+}*/
+
+
+int DISC(int fd){
+    int res;
+    unsigned char buf2[10];
+    buf2[0]=FLAG;                       ////0x5c
+    buf2[1]=ADDRESS_sent_by_Sender;     ////0x03
+    buf2[2]=////??????????????????????????????????????????????
+    buf2[3]=buf2[1]^buf2[2];
+    buf2[4]=FLAG;                       ////0x5c
+    buf2[5] = '\n';
+//    printf("Ola: %s; %c\n",buf2,buf[1]);
+    res = write(fd,buf2,5);
+
+    printf("%d bytes written\n", res);
+
+    return NULL;
+}
+
+
+int UA(int fd){
+    int res;
+    unsigned char buf2[10];
+    buf2[0]=FLAG;                       ////0x5c
+    buf2[1]=ADDRESS_answers_from_Sender;     ////0x03
+    buf2[2]=CONTROL_UA;                ////0x08
+    buf2[3]=buf2[1]^buf2[2];
+    buf2[4]=FLAG;                       ////0x5c
+    buf2[5] = '\n';
+//    printf("Ola: %s; %c\n",buf2,buf[1]);
+    res = write(fd,buf2,5);
+
+    printf("%d bytes written\n", res);
+
+    return NULL;
+}
+
 
 int main(int argc, char** argv)
 {
@@ -80,7 +215,7 @@ int main(int argc, char** argv)
     /*testing*/
 /*    buf[25] = '\n';*/
 
-
+/*
     unsigned char buf2[10];
     buf2[0]=0x5c;
     buf2[1]=0x01;
@@ -89,12 +224,39 @@ int main(int argc, char** argv)
     buf2[4]=0x5c;
 
     buf2[5] = '\n';
-    printf("Ola: %s; %c\n",buf2);
+    printf("Ola: %s; %c\n",buf2,buf[1]);
 //    res = write(fd,buf,255);
     /*res = write(fd,buf,5);*/
-    res = write(fd,buf2,5);
+/*    res = write(fd,buf2,5);
 
     printf("%d bytes written\n", res);
+*/
+    SET(fd);
+
+    while (STOP==FALSE) {       /* loop for input */
+        
+        res = read(fd,buf,255);   /* returns after 5 chars have been input */
+        //buf[res]=0;               /* so we can printf... */
+        printf("buf0: %x \n", buf[0]);
+        printf("buf0: %x \n", buf[1]);
+        printf("buf0: %x \n", buf[2]);
+        printf("buf0: %x \n", buf[3]);
+        printf("buf0: %x \n", buf[4]);
+        printf("buf0: %c \n", buf[0]);
+        printf("buf0: %c \n", buf[1]);
+        printf("buf0: %c \n", buf[2]);
+        printf("buf0: %c \n", buf[3]);
+        printf("buf0: %c \n", buf[4]);
+        printf("%d\n",fd);
+        if((buf[0]==0x5c) && (buf[1]==0x03) && (buf[2]==0x06) && (buf[3]==(0x03^0x06)) && (buf[4]==0x5c)){          ////Verifico se recebi a mensagem de SET para enviar um UA
+              //I_0(fd);
+              break;
+            
+        }
+        printf(":%s:%d\n", buf, res);
+        if (buf[0]=='z') STOP=TRUE;
+    }
+
 
 
     /*
