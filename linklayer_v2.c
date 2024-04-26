@@ -487,10 +487,17 @@ int UA_open(int fd){
 
 int I_0(int fd, char *buf2, int tamanho){
     int res;
-    int n_carateres=1,i=0;
+    int n_carateres=1,i=5;
     //unsigned char buf2[10];
     char BBC2 = 0x00;
-    while(i<tamanho){
+    buf2[0]=FLAG;                               ////0x5c
+    buf2[1]=ADDRESS_sent_by_Sender;             ////0x01
+    buf2[2]=CONTROL_I0;                         ////0x80
+    buf2[3]=buf2[1]^buf2[2];
+    buf2[4]=FLAG;                               ////0x5c
+    //buf2[5] = '\n';
+    
+    while(i<(tamanho+5)){
         BBC2 = BBC2^buf2[i];
         if(buf2[i]==0x5c){
             res = write(fd,0x5d,1);
@@ -533,6 +540,133 @@ int I_0(int fd, char *buf2, int tamanho){
     
 
 }
+
+
+int I_1(int fd, char *buf2, int tamanho){
+    int res;
+    int n_carateres=1,i=5;
+    //unsigned char buf2[10];
+    char BBC2 = 0x00;
+    buf2[0]=FLAG;                               ////0x5c
+    buf2[1]=ADDRESS_sent_by_Sender;             ////0x01
+    buf2[2]=CONTROL_I1;                         ////0xC0
+    buf2[3]=buf2[1]^buf2[2];
+    buf2[4]=FLAG;                               ////0x5c
+    //buf2[5] = '\n';
+    while(i<(tamanho+5)){       //porque contando com o header ficam mais 5 unidades de dados
+        BBC2 = BBC2^buf2[i];
+        if(buf2[i]==0x5c){
+            res = write(fd,0x5d,1);
+            res = write(fd,0x7c,1);
+        }
+        else if(buf2[i]==0x5d){
+            res = write(fd,0x5d,1);
+            res = write(fd,0x7d,1);
+        }
+        else{
+            res = write(fd,buf2[i],1);
+        }
+        i++;
+    }
+    res = write(fd,BBC2,1);
+    res = write(fd,0x5c,1);
+
+        /*printf("buf20: %x \n", buf2[0]);
+        printf("buf20: %x \n", buf2[1]);
+        printf("buf20: %x \n", buf2[2]);
+        printf("buf20: %x \n", buf2[3]);
+        printf("buf20: %x \n", buf2[4]);
+        printf("buf20: %c \n", buf2[0]);
+        printf("buf20: %c \n", buf2[1]);
+        printf("buf20: %c \n", buf2[2]);
+        printf("buf20: %c \n", buf2[3]);
+        printf("buf20: %c \n", buf2[4]);*/
+    /*buf2[0]=0x5c;
+    buf2[1]=0x03;
+    buf2[2]=0x08;
+    buf2[3]=buf2[1]^buf2[2];
+    buf2[4]=0x5c;
+    buf2[5] = '\n';*/
+//    printf("Ola: %s; %c\n",buf2,buf[1]);
+    
+
+    printf("%d bytes written\n", res);
+
+    return NULL;
+    
+
+}
+
+int RR1(int fd){
+    int res;
+    unsigned char buf2[10];
+    buf2[0]=FLAG;                               ////0x5c
+    buf2[1]=ADDRESS_answers_from_Receiver;      ////0x03????????????????????????????
+    buf2[2]=CONTROL_RR1;
+    buf2[3]=buf2[1]^buf2[2];
+    buf2[4]=FLAG;                               ////0x5c
+    buf2[5] = '\n';
+//    printf("Ola: %s; %c\n",buf2,buf[1]);
+    res = write(fd,buf2,5);
+
+    printf("%d bytes written\n", res);
+
+    return NULL;
+}
+
+int RR0(int fd){
+    int res;
+    unsigned char buf2[10];
+    buf2[0]=FLAG;                               ////0x5c
+    buf2[1]=ADDRESS_answers_from_Receiver;      ////0x03????????????????????????????
+    buf2[2]=CONTROL_RR0;
+    buf2[3]=buf2[1]^buf2[2];
+    buf2[4]=FLAG;                               ////0x5c
+    buf2[5] = '\n';
+//    printf("Ola: %s; %c\n",buf2,buf[1]);
+    res = write(fd,buf2,5);
+
+    printf("%d bytes written\n", res);
+
+    return NULL;
+}
+
+
+int REJ1(int fd){
+    int res;
+    unsigned char buf2[10];
+    buf2[0]=FLAG;                               ////0x5c
+    buf2[1]=ADDRESS_answers_from_Receiver;      ////0x03????????????????????????????
+    buf2[2]=CONTROL_REJ1;
+    buf2[3]=buf2[1]^buf2[2];
+    buf2[4]=FLAG;                               ////0x5c
+    buf2[5] = '\n';
+//    printf("Ola: %s; %c\n",buf2,buf[1]);
+    res = write(fd,buf2,5);
+
+    printf("%d bytes written\n", res);
+
+    return NULL;
+}
+
+int REJ0(int fd){
+    int res;
+    unsigned char buf2[10];
+    buf2[0]=FLAG;                               ////0x5c
+    buf2[1]=ADDRESS_answers_from_Receiver;      ////0x03????????????????????????????
+    buf2[2]=CONTROL_REJ0;
+    buf2[3]=buf2[1]^buf2[2];
+    buf2[4]=FLAG;                               ////0x5c
+    buf2[5] = '\n';
+//    printf("Ola: %s; %c\n",buf2,buf[1]);
+    res = write(fd,buf2,5);
+
+    printf("%d bytes written\n", res);
+
+    return NULL;
+}
+
+
 
 
 
@@ -953,3 +1087,56 @@ int llclose(int fd, linkLayer connectionParameters, int showStatistics){
     close(fd);
     return 1;    
 }
+
+
+
+
+
+///int llwrite(unsigned char* buf, int bufSize);
+///int llread(unsigned char* packet);
+/*
+
+int i = 0;
+int ret;
+char BBC2=0x00;
+char BCC2_anterior;
+char BCC2_enviado;
+char valor_lido;
+char valor_lido2;
+
+while(state==BCCOK){
+    ret = read(fd, &valor_lido,1);
+    statemachine_I0(valor_lido);
+    if(valor_lido==0x5d){
+        ret = read(fd,&valor_lido_2,1);
+        if(valor_lido2==0x7c){
+            buf[i]=0x5c;
+        }
+        if(valor_lido2==0x7d){
+            buf[i]==0x5d;
+        }
+        else{
+            printf("Sequencia de 0x5d seguda de um valor diferente dos espectados.\n")
+        }
+    }
+    if(balor_lido==0x5c){
+        BCC2_enviado=buf[i-1];
+        buf[i-1]="/n";              ////Para limpar do buffer o que considerei dado, masera o BCC2_enviado
+        BCC2=BCC2_anterior;         ////Porque faço XOR com o BCC2enviado no loop anterior, e este não deve contar para o XOR
+        break;                      ///Porque neste estado termina a receção de dados devido a ter chegado á ultima flag
+    }
+    BCC2_anterior=BCC2;
+    BCC2=BCC2^buf[i];
+    i++;
+}
+
+if(BCC2==BCC2_enviado){
+    printf("Sucesso.\n");
+    return 1;
+}
+else{
+    state=BBCOK;        //Para fazer retransmição...
+}
+
+
+*/

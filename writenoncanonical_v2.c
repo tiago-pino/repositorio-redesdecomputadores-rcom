@@ -496,10 +496,17 @@ int UA_open(int fd){
 
 int I_0(int fd, char *buf2, int tamanho){
     int res;
-    int n_carateres=1,i=0;
+    int n_carateres=1,i=5;
     //unsigned char buf2[10];
     char BBC2 = 0x00;
-    while(i<tamanho){
+    buf2[0]=FLAG;                               ////0x5c
+    buf2[1]=ADDRESS_sent_by_Sender;             ////0x01
+    buf2[2]=CONTROL_I0;                         ////0x80
+    buf2[3]=buf2[1]^buf2[2];
+    buf2[4]=FLAG;                               ////0x5c
+    //buf2[5] = '\n';
+    
+    while(i<(tamanho+5)){
         BBC2 = BBC2^buf2[i];
         if(buf2[i]==0x5c){
             res = write(fd,0x5d,1);
@@ -541,6 +548,131 @@ int I_0(int fd, char *buf2, int tamanho){
     return NULL;
     
 
+}
+
+
+int I_1(int fd, char *buf2, int tamanho){
+    int res;
+    int n_carateres=1,i=5;
+    //unsigned char buf2[10];
+    char BBC2 = 0x00;
+    buf2[0]=FLAG;                               ////0x5c
+    buf2[1]=ADDRESS_sent_by_Sender;             ////0x01
+    buf2[2]=CONTROL_I1;                         ////0xC0
+    buf2[3]=buf2[1]^buf2[2];
+    buf2[4]=FLAG;                               ////0x5c
+    //buf2[5] = '\n';
+    while(i<(tamanho+5)){       //porque contando com o header ficam mais 5 unidades de dados
+        BBC2 = BBC2^buf2[i];
+        if(buf2[i]==0x5c){
+            res = write(fd,0x5d,1);
+            res = write(fd,0x7c,1);
+        }
+        else if(buf2[i]==0x5d){
+            res = write(fd,0x5d,1);
+            res = write(fd,0x7d,1);
+        }
+        else{
+            res = write(fd,buf2[i],1);
+        }
+        i++;
+    }
+    res = write(fd,BBC2,1);
+    res = write(fd,0x5c,1);
+
+        /*printf("buf20: %x \n", buf2[0]);
+        printf("buf20: %x \n", buf2[1]);
+        printf("buf20: %x \n", buf2[2]);
+        printf("buf20: %x \n", buf2[3]);
+        printf("buf20: %x \n", buf2[4]);
+        printf("buf20: %c \n", buf2[0]);
+        printf("buf20: %c \n", buf2[1]);
+        printf("buf20: %c \n", buf2[2]);
+        printf("buf20: %c \n", buf2[3]);
+        printf("buf20: %c \n", buf2[4]);*/
+    /*buf2[0]=0x5c;
+    buf2[1]=0x03;
+    buf2[2]=0x08;
+    buf2[3]=buf2[1]^buf2[2];
+    buf2[4]=0x5c;
+    buf2[5] = '\n';*/
+//    printf("Ola: %s; %c\n",buf2,buf[1]);
+    
+
+    printf("%d bytes written\n", res);
+
+    return NULL;
+    
+
+}
+
+int RR1(int fd){
+    int res;
+    unsigned char buf2[10];
+    buf2[0]=FLAG;                               ////0x5c
+    buf2[1]=ADDRESS_answers_from_Receiver;      ////0x03????????????????????????????
+    buf2[2]=CONTROL_RR1;
+    buf2[3]=buf2[1]^buf2[2];
+    buf2[4]=FLAG;                               ////0x5c
+    buf2[5] = '\n';
+//    printf("Ola: %s; %c\n",buf2,buf[1]);
+    res = write(fd,buf2,5);
+
+    printf("%d bytes written\n", res);
+
+    return NULL;
+}
+
+int RR0(int fd){
+    int res;
+    unsigned char buf2[10];
+    buf2[0]=FLAG;                               ////0x5c
+    buf2[1]=ADDRESS_answers_from_Receiver;      ////0x03????????????????????????????
+    buf2[2]=CONTROL_RR0;
+    buf2[3]=buf2[1]^buf2[2];
+    buf2[4]=FLAG;                               ////0x5c
+    buf2[5] = '\n';
+//    printf("Ola: %s; %c\n",buf2,buf[1]);
+    res = write(fd,buf2,5);
+
+    printf("%d bytes written\n", res);
+
+    return NULL;
+}
+
+
+int REJ1(int fd){
+    int res;
+    unsigned char buf2[10];
+    buf2[0]=FLAG;                               ////0x5c
+    buf2[1]=ADDRESS_answers_from_Receiver;      ////0x03????????????????????????????
+    buf2[2]=CONTROL_REJ1;
+    buf2[3]=buf2[1]^buf2[2];
+    buf2[4]=FLAG;                               ////0x5c
+    buf2[5] = '\n';
+//    printf("Ola: %s; %c\n",buf2,buf[1]);
+    res = write(fd,buf2,5);
+
+    printf("%d bytes written\n", res);
+
+    return NULL;
+}
+
+int REJ0(int fd){
+    int res;
+    unsigned char buf2[10];
+    buf2[0]=FLAG;                               ////0x5c
+    buf2[1]=ADDRESS_answers_from_Receiver;      ////0x03????????????????????????????
+    buf2[2]=CONTROL_REJ0;
+    buf2[3]=buf2[1]^buf2[2];
+    buf2[4]=FLAG;                               ////0x5c
+    buf2[5] = '\n';
+//    printf("Ola: %s; %c\n",buf2,buf[1]);
+    res = write(fd,buf2,5);
+
+    printf("%d bytes written\n", res);
+
+    return NULL;
 }
 
 
