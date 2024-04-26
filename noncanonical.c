@@ -11,6 +11,20 @@
 #define FALSE 0
 #define TRUE 1
 
+//////////////////////////////////////
+//state machine
+volatile int STOP=FALSE;
+int state = 0;
+#define START 0
+#define FLAGRCV 1
+#define ARCV 2
+#define CRCV 3
+#define BCCOK 4
+#define STOP_STATE_MACHINE 5
+
+///////////////////////////////////
+
+
 
 ////
 #define FLAG 0x5c
@@ -26,6 +40,81 @@
 
 
 
+
+
+
+
+
+////////////////////////////////
+
+void statemachine(unsigned char byte)
+{
+    switch (state)
+    {
+        case START:
+            if(byte==0x5c) state = FLAGRCV;
+            break;
+        case FLAGRCV:
+            if(byte==0x03) state = ARCV;
+            else if(byte==0x5c) state = FLAGRCV;
+            else state = START;   
+            break;
+        case ARCV:
+            if(byte==0x08) state = CRCV;
+            else if(byte==0x5c) state = FLAGRCV;
+            else state = START;
+            break;
+        case CRCV:
+            if(byte==(0x03^0x08)) state = BCCOK;
+            else if(byte==0x5c) state = FLAGRCV;
+            else state = START; 
+            break;  
+        case BCCOK:  
+            if(byte==0x5c) state = STOP_STATE_MACHINE;
+            else state = START;  
+            break;
+        default:
+            printf("Saiu da maquina de estados!\n");
+            break;
+            
+    }
+}
+
+void statemachine1(unsigned char byte)
+{
+    switch (state)
+    {
+        case START:
+            if(byte==0x5c) state = FLAGRCV;
+            break;
+        case FLAGRCV:
+            if(byte==0x01) state = ARCV;
+            else if(byte==0x5c) state = FLAGRCV;
+            else state = START;   
+            break;
+        case ARCV:
+            if(byte==0x06) state = CRCV;
+            else if(byte==0x5c) state = FLAGRCV;
+            else state = START;
+            break;
+        case CRCV:
+            if(byte==(0x03^0x06)) state = BCCOK;
+            else if(byte==0x5c) state = FLAGRCV;
+            else state = START; 
+            break;  
+        case BCCOK:  
+            if(byte==0x5c) state = STOP_STATE_MACHINE;
+            else state = START;  
+            break;
+        default:
+            printf("Saiu da maquina de estados!\n");
+            break;
+            
+    }
+}
+
+
+///////////////////////////////////////////////////////////////
 
 int UA(int fd){
     int res;
@@ -107,6 +196,7 @@ int main(int argc, char** argv)
     int fd,c, res;
     struct termios oldtio,newtio;
     char buf[255];
+    char valor_read;            //Valores lidos da porta serie
 
     if ( (argc < 2) ||
          ((strcmp("/dev/ttyS10", argv[1])!=0) &&
@@ -158,7 +248,7 @@ int main(int argc, char** argv)
     
     while (STOP==FALSE) {       /* loop for input */
         
-        res = read(fd,buf,255);   /* returns after 5 chars have been input */
+        /*res = read(fd,buf,255);   /* returns after 5 chars have been input */
         //buf[res]=0;               /* so we can printf... */
         printf("buf0: %x \n", buf[0]);
         printf("buf0: %x \n", buf[1]);
@@ -170,15 +260,63 @@ int main(int argc, char** argv)
         printf("buf0: %c \n", buf[2]);
         printf("buf0: %c \n", buf[3]);
         printf("buf0: %c \n", buf[4]);
-        printf("%d\n",fd);
-        if((buf[0]==0x5c) && (buf[1]==0x03) && (buf[2]==0x08) && (buf[3]==(0x03^0x08)) && (buf[4]==0x5c)){          ////Verifico se recebi a mensagem de SET para enviar um UA
+        printf("%d\n",fd);*/
+
+
+
+
+
+
+        if((buf[0]==) && (buf[1]==0x03) && (buf[2]==0x08) && (buf[3]==(0x03^0x08)) && (buf[4]==0x5c)){          ////Verifico se recebi a mensagem de SET para enviar um UA
               UA(fd);
               break;
             
         }
+
         printf(":%s:%d\n", buf, res);
         if (buf[0]=='z') STOP=TRUE;
     }
+
+
+
+if(RECETOR|| EMISSOR){      //vERIFICO SE É EMISSOR OU RECETOR
+    while(){
+        while(STOP==FALSE){
+            
+                res= read(fd,valor_lido,1); 
+                statemachine(valor_lido);
+                printf("STATE IS: %d\n",state);
+                if(state==STOP_STATE_MACHINE) 
+                
+                STOP=TRUE;
+                state=START;
+            }
+            //SET
+
+    }
+}
+
+
+
+
+
+        while(STOP==FALSE){
+        
+            res= read(fd,valor_lido,1); 
+            statemachine1(valor_lido);
+            printf("STATE IS: %d\n",state);
+            if(state==STOP_STATE_MACHINE) 
+            
+            STOP=TRUE;
+            state=START;
+        }
+
+}
+
+    
+
+
+
 
 
 
