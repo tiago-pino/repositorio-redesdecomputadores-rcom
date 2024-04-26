@@ -21,6 +21,7 @@ int state = 0;
 #define CRCV 3
 #define BCCOK 4
 #define STOP_STATE_MACHINE 5
+#define START_DATA 6
 
 ///////////////////////////////////
 
@@ -490,6 +491,59 @@ int UA_open(int fd){
 }
 
 
+int I_0(int fd, char *buf2, int tamanho){
+    int res;
+    int n_carateres=1,i=0;
+    //unsigned char buf2[10];
+    char BBC2 = 0x00;
+    while(i<tamanho){
+        BBC2 = BBC2^buf2[i];
+        if(buf2[i]==0x5c){
+            res = write(fd,0x5d,1);
+            res = write(fd,0x7c,1);
+        }
+        else if(buf2[i]==0x5d){
+            res = write(fd,0x5d,1);
+            res = write(fd,0x7d,1);
+        }
+        else{
+            res = write(fd,buf2[i],1);
+        }
+        i++;
+    }
+    res = write(fd,BBC2,1);
+    res = write(fd,0x5c,1);
+
+        /*printf("buf20: %x \n", buf2[0]);
+        printf("buf20: %x \n", buf2[1]);
+        printf("buf20: %x \n", buf2[2]);
+        printf("buf20: %x \n", buf2[3]);
+        printf("buf20: %x \n", buf2[4]);
+        printf("buf20: %c \n", buf2[0]);
+        printf("buf20: %c \n", buf2[1]);
+        printf("buf20: %c \n", buf2[2]);
+        printf("buf20: %c \n", buf2[3]);
+        printf("buf20: %c \n", buf2[4]);*/
+    /*buf2[0]=0x5c;
+    buf2[1]=0x03;
+    buf2[2]=0x08;
+    buf2[3]=buf2[1]^buf2[2];
+    buf2[4]=0x5c;
+    buf2[5] = '\n';*/
+//    printf("Ola: %s; %c\n",buf2,buf[1]);
+    
+
+    printf("%d bytes written\n", res);
+
+    return NULL;
+    
+
+}
+
+
+
+
+
 int UA_close(int fd){
     int res;
     unsigned char buf2[10];
@@ -670,7 +724,7 @@ int main(int argc, char** argv)
                 STOP=TRUE;
                 state=START;
             } 
-            printf(":%u:%d\n", valor_lido, res);                ////Para comentar
+            printf(":%x:%d\n", valor_lido, res);                ////Para comentar
             if (valor_lido=='z') STOP=TRUE;                     ////Para comentar
         }
             //SET
@@ -692,8 +746,65 @@ int main(int argc, char** argv)
         return -1;
     }
 */
-///////////////////
 
+    STOP = FALSE;
+
+    while(STOP==FALSE){
+                        
+        res = read(fd,&valor_lido,1);         //Lê um caratér e envia para a máquina de estados verificar para que estado avança
+        statemachine_DISC_0(valor_lido);
+        printf("STATE IS: %d\n",state);
+        if(state==STOP_STATE_MACHINE){
+            STOP=TRUE;
+            state=START;
+        } 
+        printf(":%x:%d\n", valor_lido, res);                ////Para comentar
+        if (valor_lido=='z') STOP=TRUE;                     ////Para comentar
+    }
+
+    STOP = FALSE;
+        ////////////
+/*        (void) signal(SIGALRM, atende);  // instala rotina que atende interrupcao
+
+
+        while(tentativas<connectionParameters.numTries && STOP==FALSE){                        //while(timeout) alarme.c
+        ////////////        
+
+
+            alarm(connectionParameters.timeOut); 
+*/
+
+
+
+        DISC_1(fd);
+
+        while(STOP==FALSE){
+                        
+            res = read(fd,&valor_lido,1);         //Lê um caratér e envia para a máquina de estados verificar para que estado avança
+            ////////
+            /*if (res < 0) {
+                perror("Erro na leitura");
+                break;
+            }*/
+            ///////////
+            statemachine_UA_close(valor_lido);
+            printf("STATE IS: %d\n",state);
+            if(state==STOP_STATE_MACHINE){
+                STOP=TRUE;
+                state=START;
+                ///////////////
+                alarm(0);           //Para parar o alarme
+                /////////////////
+            } 
+            printf(":%x:%d\n", valor_lido, res);                ////Para comentar
+            if (valor_lido=='z') STOP=TRUE;                     ////Para comentar
+        }
+    ///////////////////
+    /*}*/
+
+
+///////////////////
+    printf("Ola final\n");
     sleep(1);
     tcsetattr(fd,TCSANOW,&oldtio);
     close(fd);
