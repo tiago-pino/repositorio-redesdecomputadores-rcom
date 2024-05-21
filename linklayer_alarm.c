@@ -981,7 +981,7 @@ llopen(linkLayer connectionParameters){
         
     
     }
-    printf("Saiu do llopen\n");sleep(5);
+    printf("Saiu do llopen\n");//sleep(5);
     if(tentativas==connectionParameters.numTries){
 
         printf("Erro ao estabelecer a ligacao.\n");
@@ -1578,7 +1578,7 @@ int llread(char* packet){
             else{
                 STOP=FALSE;        //Para fazer retransmição...
                 reject=1;n_carateres_lidos=0;
-                printf("rej\n");sleep(3);
+                printf("rej\n");//sleep(3);
                 i=0;                //Para reescrever em cima e não continuar a escrever no vetor
                 REJ1(fd);
             }
